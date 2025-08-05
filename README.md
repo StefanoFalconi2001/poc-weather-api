@@ -55,14 +55,14 @@ npm run test:cov
 ## 📦 API Documentation
 
 Swagger está disponible en:  
-👉 http://localhost:3000/api
+👉 http://localhost:4000/api
 
 ---
 
 ## 🐳 Docker
 
 docker build -t weatherly-backend .  
-docker run -p 3000:3000 weatherly-backend
+docker run -p 4000:4000 weatherly-backend
 
 ---
 

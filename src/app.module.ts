@@ -8,7 +8,7 @@ console.log('MongoDB URI:', process.env.MONGODB_URI);
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot('mongodb://mongo-db:27017/weathersdb'),
+    MongooseModule.forRoot(process.env.MONGODB_URI),
     WeatherModule,
   ],
 })

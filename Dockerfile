@@ -10,14 +10,14 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the project
+# Copy the rest of the project (including .env)
 COPY . .
 
 # Build the NestJS project
 RUN npm run build
 
 # Expose the API port
-EXPOSE 3000
+EXPOSE 4000
 
-# Command to start the app
-CMD ["node", "dist/main"]
+# Optional: you can use this if not specifying the command in docker-compose.yml
+CMD ["npm", "run", "start:prod"]

@@ -3,7 +3,7 @@ services:
     container_name: nest-api
     build: .
     ports:
-      - '3000:3000'
+      - '4000:4000'
     environment:
       - MONGODB_URI=mongodb://mongo:27017/weathersdb
     depends_on:
