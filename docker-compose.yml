@@ -10,9 +10,12 @@ services:
       - '3000:3000'
     env_file:
       - .env
+      - '4000:4000'
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/weathersdb
     depends_on:
       - mongo
-
+      
   mongo:
     container_name: mongo-db
     image: mongo:6
