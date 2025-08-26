@@ -2,20 +2,22 @@ version: '3.9'
 
 services:
   api:
-    container_name: nest-api
+    container_name: nest-api-dev
     build:
       context: .
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
     ports:
       - '3000:3000'
     env_file:
       - .env
-      - '4000:4000'
-    environment:
-      - MONGODB_URI=mongodb://mongo:27017/weathersdb
     depends_on:
       - mongo
-      
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run start:dev
+    restart: unless-stopped
+
   mongo:
     container_name: mongo-db
     image: mongo:6
