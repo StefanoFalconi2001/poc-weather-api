@@ -7,8 +7,6 @@ import { MongooseModule } from '@nestjs/mongoose';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
-    MongooseModule.forRoot(process.env.MONGODB_URI || ''),
-
     MongooseModule.forRoot(process.env.MONGODB_URI),
 
     WeatherModule,
