@@ -37,3 +37,4 @@ Thumbs.db
 
 # Optional coverage folder if using testing tools
 coverage/
+azure-credentials.json
