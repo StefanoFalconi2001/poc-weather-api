@@ -1,0 +1,43 @@
+name: Build and Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ACR_NAME: weatherlyrg         
+  IMAGE_NAME: poc-weather-api   
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to ACR
+        run: |
+          az acr login --name $ACR_NAME
+
+      - name: Build and push image
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}   # Primeros 7 caracteres del SHA
+          IMAGE=$ACR_NAME.azurecr.io/$IMAGE_NAME:$IMAGE_TAG
+          echo "Building Docker image: $IMAGE"
+          docker build -t $IMAGE .
+          docker push $IMAGE
+          # Guardar IMAGE para steps siguientes
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "weatherly-api"     
+          images: ${{ env.IMAGE }}
