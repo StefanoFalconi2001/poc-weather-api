@@ -1,21 +1,27 @@
-name: Build and Deploy Backend
+name: Build and Deploy Backend QA
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 env:
   ACR_NAME: weatherlyrg
   IMAGE_NAME: poc-weather-api
 
 jobs:
-  build-and-deploy:
+  build-and-deploy-qa:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Azure login
         uses: azure/login@v1
@@ -25,7 +31,6 @@ jobs:
       - name: Log in to ACR
         run: az acr login --name $ACR_NAME
 
-      # 🔹 Establecer versión semántica con Changesets
       - name: Generate Version from Changeset
         run: |
           npx changeset version
@@ -40,8 +45,12 @@ jobs:
           docker push $IMAGE
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
+      - name: Wait for manual approval
+        uses: hmarr/auto-approve-action@v2
+        if: false # Solo para mostrar, usar GitHub Environments para aprobación real
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'weatherly-api'
+          app-name: 'weatherly-api-qa'
           images: ${{ env.IMAGE }}
