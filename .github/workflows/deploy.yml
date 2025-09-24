@@ -1,14 +1,16 @@
-name: Build and Deploy Backend QA
+name: Build and Deploy Backend
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 env:
   ACR_NAME: weatherlyrg
   IMAGE_NAME: poc-weather-api
 
 jobs:
-  build-and-deploy-qa:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -45,12 +47,8 @@ jobs:
           docker push $IMAGE
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
-      - name: Wait for manual approval
-        uses: hmarr/auto-approve-action@v2
-        if: false # Solo para mostrar, usar GitHub Environments para aprobación real
-
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'weatherly-api-qa'
+          app-name: 'weatherly-api'
           images: ${{ env.IMAGE }}
