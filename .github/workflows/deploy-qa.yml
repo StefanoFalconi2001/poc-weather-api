@@ -1,0 +1,66 @@
+name: Deploy QA Backend
+
+# Flujo manual (workflow_dispatch permite ejecutar manualmente desde GitHub)
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versión del changeset a desplegar'
+        required: true
+        default: 'latest'
+
+env:
+  ACR_NAME: weatherlyrg
+  IMAGE_NAME: poc-weather-api-qa
+
+jobs:
+  build-and-deploy-qa:
+    runs-on: ubuntu-latest
+    environment: QA # Esto asegura que se use tu environment con aprobación manual
+
+    steps:
+      # 🔹 Obtener el código
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 🔹 Login en Azure
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # 🔹 Login en ACR
+      - name: Log in to ACR
+        run: az acr login --name $ACR_NAME
+
+      # 🔹 Instalar dependencias y preparar versión
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      # 🔹 Usar versión ingresada por workflow_dispatch
+      - name: Set IMAGE_TAG
+        run: echo "IMAGE_TAG=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+
+      # 🔹 Construir y subir la imagen
+      - name: Build and push Docker image
+        run: |
+          IMAGE=$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ env.IMAGE_TAG }}
+          echo "Building Docker image: $IMAGE"
+          docker build -t $IMAGE .
+          docker push $IMAGE
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      # 🔹 Desplegar en Azure Web App
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'weatherly-api-qa'
+          images: ${{ env.IMAGE }}
+          slot-name: 'production' # o slot de QA si usas slots
+          configuration-strings: |
+            MONGODB_URI=${{ secrets.MONGODB_URI_QA }}
