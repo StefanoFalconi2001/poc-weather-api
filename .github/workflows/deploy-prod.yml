@@ -50,5 +50,5 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'weatherly-api'
+          app-name: 'weatherly-api-ci'
           images: ${{ env.IMAGE }}
