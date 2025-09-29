@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  ACR_NAME: weatherlyrg
+  ACR_NAME: weatherlyacr
   IMAGE_NAME: poc-weather-api
 
 jobs:
