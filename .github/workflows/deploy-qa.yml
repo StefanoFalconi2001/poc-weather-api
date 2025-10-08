@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Versión del changeset a desplegar'
+        description: "Versión del changeset a desplegar"
         required: true
-        default: 'latest'
+        default: "latest"
 
 env:
   ACR_NAME: weatherlyrg
@@ -28,30 +28,15 @@ jobs:
       - name: Log in to ACR
         run: az acr login --name $ACR_NAME
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Set IMAGE_TAG
-        run: echo "IMAGE_TAG=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-
-      - name: Build and push Docker image
+      - name: Set IMAGE
         run: |
-          IMAGE=$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ env.IMAGE_TAG }}
-          echo "Building Docker image: $IMAGE"
-          docker build -t $IMAGE .
-          docker push $IMAGE
+          IMAGE=$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.event.inputs.version }}
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'weatherly-api-qa'
+          app-name: "weatherly-api-qa"
           images: ${{ env.IMAGE }}
-          slot-name: 'production'
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI_QA }}
