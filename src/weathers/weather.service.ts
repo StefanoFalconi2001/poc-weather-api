@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Weather, WeatherDocument } from 'src/schemas/weather.schemas';
 import { Model } from 'mongoose';
@@ -34,9 +34,27 @@ export class WeatherService {
   async update(
     id: string,
     weather: UpdateWeatherDto,
-  ): Promise<WeatherDocument | null> {
-    return this.weatherModel
-      .findByIdAndUpdate(id, weather, { new: true })
+  ): Promise<WeatherDocument> {
+    const updatedWeather = await this.weatherModel
+      .findByIdAndUpdate(
+        id,
+        { ...weather, updatedAt: new Date() }, // opcional
+        { new: true },
+      )
       .exec();
+
+    if (!updatedWeather) {
+      throw new NotFoundException('Weather not found');
+    }
+
+    return updatedWeather;
+  }
+
+  async deleteAll(): Promise<void> {
+    await this.weatherModel.deleteMany({});
+  }
+
+  async count(): Promise<number> {
+    return this.weatherModel.countDocuments();
   }
 }
