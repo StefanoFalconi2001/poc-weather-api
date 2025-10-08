@@ -23,7 +23,7 @@ jobs:
       - name: Azure login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_QA }}
 
       - name: Log in to ACR
         run: az acr login --name $ACR_NAME
