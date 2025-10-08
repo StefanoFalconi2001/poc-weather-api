@@ -58,8 +58,7 @@ export class WeatherController {
         typeof error === 'object' &&
         error !== null &&
         'code' in error &&
-        typeof (error as { code?: unknown }).code === 'number' &&
-        (error as { code: number }).code === 11000
+        (error as { code?: unknown }).code === 11000
       ) {
         throw new ConflictException('Weather already exists');
       }
@@ -88,8 +87,21 @@ export class WeatherController {
   @ApiConflictResponse({ description: 'Conflict occurred while updating' })
   @HttpCode(200)
   async update(@Param('id') id: string, @Body() body: UpdateWeatherDto) {
-    const weather = await this.weatherService.update(id, body);
-    if (!weather) throw new NotFoundException('Weather not found');
-    return weather;
+    // Simplificado: el service ya lanza NotFoundException si no existe
+    return this.weatherService.update(id, body);
+  }
+
+  @Get('count')
+  @ApiOperation({ summary: 'Count all weather records' })
+  @ApiResponse({ status: 200, description: 'Total number of records' })
+  async count() {
+    return { total: await this.weatherService.count() };
+  }
+
+  @Delete('all')
+  @ApiOperation({ summary: 'Delete all weather records (dev only)' })
+  @HttpCode(204)
+  async deleteAll() {
+    await this.weatherService.deleteAll();
   }
 }
