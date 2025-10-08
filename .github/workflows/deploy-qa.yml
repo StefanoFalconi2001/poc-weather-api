@@ -9,7 +9,7 @@ on:
 
 env:
   ACR_NAME: weatherlyacr
-  IMAGE_NAME: poc-weather-api-qa
+  IMAGE_NAME: poc-weather-api
 
 jobs:
   build-and-deploy-qa:
@@ -36,7 +36,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "weatherly-api-qa"
+          app-name: "poc-weather-api"
           images: ${{ env.IMAGE }}
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI_QA }}
