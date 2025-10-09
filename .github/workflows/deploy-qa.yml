@@ -33,6 +33,15 @@ jobs:
           IMAGE=$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.event.inputs.version }}
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
+      - name: Check if image exists in ACR
+        run: |
+          TAG=${{ github.event.inputs.version }}
+          EXISTS=$(az acr repository show-tags --name $ACR_NAME --repository $IMAGE_NAME --query "[?contains(@, '$TAG')]" -o tsv)
+          if [ -z "$EXISTS" ]; then
+            echo "The image '$TAG' does not exist in the ACR. Verify the input version."
+            exit 1
+          fi
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
