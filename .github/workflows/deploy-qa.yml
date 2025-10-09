@@ -45,7 +45,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "poc-weather-api"
+          app-name: "weatherly-api-qa"
           images: ${{ env.IMAGE }}
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI_QA }}
